@@ -68,8 +68,36 @@ router.post('/courses/:courseId', userMiddleware, async (req, res) => {
     }
 });
 
-router.get('/purchasedCourses', userMiddleware, (req, res) => {
-    
+router.get('/purchasedCourses', userMiddleware, async (req, res) => {
+    try {
+        const token = req.headers.authorization;
+        const words = token.split(" ");
+        const jwt_token = words[1];
+        const decoded_value = jwt.verify(jwt_token, secret);
+        const username = decoded_value.username;
+
+        const find = await User.find({
+            username: username
+        });
+
+        if (find.length) {
+            const user = find[0]; // Access the first document in the array
+            const courses = user.purchased_courses;
+
+            res.status(200).json({
+                purchased_courses: courses
+            });
+        } else {
+            res.status(400).json({
+                msg: "No courses found!"
+            });
+        }
+    } catch (error) {
+        console.error("Error fetching purchased courses:", error);
+        res.status(500).json({
+            msg: "Internal Server Error"
+        });
+    }
 });
 
 module.exports = router
