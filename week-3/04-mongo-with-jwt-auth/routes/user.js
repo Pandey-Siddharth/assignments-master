@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken");
 router.post('/signup', async (req, res) => {
     const users = await User.create({
         username : req.body.username,
-        password : req.body.password
+        password : req.body.password,
     })
     res.json({
         message : "Created Successfully",
